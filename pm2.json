@@ -1,0 +1,16 @@
+{
+  "apps": [{
+    "name": "you_thinkjs",
+    "script": "www/production.js",
+    "cwd": "/home/jiaciwang/Code/tmp/you_thinkjs",
+    "exec_mode": "cluster",
+    "instances": 0,
+    "max_memory_restart": "1G",
+    "autorestart": true,
+    "node_args": [],
+    "args": [],
+    "env": {
+      
+    }
+  }]
+}
