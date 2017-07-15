@@ -6,7 +6,7 @@
 + 计划添加基于Vue.js的后台管理系统、PC版、Ｗap版
 
 
-### 安装配置
+### 本地开发环境配置
 + 克隆项目到本地
 ```
 git clone https://github.com/tumobi/nideshop
@@ -45,6 +45,8 @@ npm install
 npm start
 ```
 访问http://127.0.0.1:8360/
+
+线上部署参考文档：[通过新浪云部署NideShop微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
 
 
 ### 微信小程序客户端截图
