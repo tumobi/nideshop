@@ -6,12 +6,45 @@
 + 计划添加基于Vue.js的后台管理系统、PC版、Ｗap版
 
 
-### 项目启动
+### 安装配置
++ 克隆项目到本地
+```
+git clone https://github.com/tumobi/nideshop
+```
++ 创建数据库nideshop并导入项目根目录下的nideshop.sql
+```
+CREATE SCHEMA `nideshop` DEFAULT CHARACTER SET utf8mb4 ;
+```
+> 注意数据库字符编码为utf8mb4 
++ 更改数据库配置
+  src/common/config/db.js
+  ```
+  export default {
+    type: 'mysql',
+    adapter: {
+        mysql: {
+        host: '127.0.0.1',
+        port: '3306',
+        database: 'nideshop',
+        user: 'root',
+        password: 'root',
+        prefix: 'nideshop_',
+        encoding: 'utf8'
+        },
+        mongo: {
 
+        }
+    }
+  };
+
+  ```
+
++ 安装依赖并启动
 ```
 npm install
 npm start
 ```
+访问http://127.0.0.1:8360/
 
 
 ### 微信小程序客户端截图
@@ -27,8 +60,6 @@ npm start
 ![商品详情](http://upload-images.jianshu.io/upload_images/3985656-99a6e0a57778d85f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
 ![购物车](http://upload-images.jianshu.io/upload_images/3985656-60ff2307d81f6bb2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
-
-![我的](http://upload-images.jianshu.io/upload_images/3985656-92d60f1f23cd4be2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
 ![订单中心](http://upload-images.jianshu.io/upload_images/3985656-dff837e6b2ec87b3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320)
 
