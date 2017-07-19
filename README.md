@@ -1,9 +1,12 @@
-### 高仿网易严选的微信小程序商城（api接口端）
+### NideShop商城（服务端）
+
 + 界面高仿网易严选商城(主要是2016年wap版)
 + 测试数据采集自网易严选商城
 + 功能和数据库参考ecshop
 + 服务端api基于Ｎode.js+ThinkJS+MySQL
 + 计划添加基于Vue.js的后台管理系统、PC版、Ｗap版
+
+本项目需要配合微信小程序端使用，GitHub: [https://github.com/tumobi/nideshop-mini-program](https://github.com/tumobi/nideshop-mini-program)
 
 
 ### 本地开发环境配置
