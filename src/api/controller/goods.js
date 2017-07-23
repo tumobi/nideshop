@@ -40,13 +40,13 @@ export default class extends Base {
     let goodsId = this.get('id');
     let model = this.model('goods');
 
-    let info = await model.where({'id': goodsId}).find();
-    let gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(4).select();
-    let attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
+    let info = await model.where({ 'id': goodsId }).find();
+    let gallery = await this.model('goods_gallery').where({ goods_id: goodsId }).limit(4).select();
+    let attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({ 'nideshop_goods_attribute.id': 'asc' }).where({ 'nideshop_goods_attribute.goods_id': goodsId }).select();
     let issue = await this.model('goods_issue').select();
-    let brand = await this.model('brand').where({id: info.brand_id}).find();
-    let commentCount = await this.model('comment').where({value_id: goodsId, type_id: 0}).count();
-    let hotComment = await this.model('comment').where({value_id: goodsId, type_id: 0}).find();
+    let brand = await this.model('brand').where({ id: info.brand_id }).find();
+    let commentCount = await this.model('comment').where({ value_id: goodsId, type_id: 0 }).count();
+    let hotComment = await this.model('comment').where({ value_id: goodsId, type_id: 0 }).find();
     let commentInfo = {};
     if (!think.isEmpty(hotComment)) {
       let commentContent = new Buffer(hotComment.content, 'base64').toString();
@@ -57,7 +57,7 @@ export default class extends Base {
         username: '明××天',
         avatar: 'http://yanxuan.nosdn.127.net/8bbc224d0f062596b8f64037a88d527e',
         level: 'V3',
-        pic_list: await this.model('comment_picture').where({comment_id: hotComment.id}).select()
+        pic_list: await this.model('comment_picture').where({ comment_id: hotComment.id }).select()
 
       }
     }
@@ -94,10 +94,10 @@ export default class extends Base {
   async categoryAction() {
 
     const model = this.model('category');
-    let currentCategory = await model.where({id: this.get('id')}).find();
-    let parentCategory = await model.where({id: currentCategory.parent_id}).find();
-    let brotherCategory = await model.where({parent_id: currentCategory.parent_id}).select();
-    let categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({category_id: currentCategory.id}).select();
+    let currentCategory = await model.where({ id: this.get('id') }).find();
+    let parentCategory = await model.where({ id: currentCategory.parent_id }).find();
+    let brotherCategory = await model.where({ parent_id: currentCategory.parent_id }).select();
+    let categoryGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({ category_id: currentCategory.id }).select();
 
     // return this.success(ftlData);
     return this.success({
@@ -136,6 +136,14 @@ export default class extends Base {
 
     if (!think.isEmpty(keyword)) {
       whereMap.name = ['like', `%${keyword}%`];
+
+      //添加到搜索历史
+      let keywords = await this.model('search_history').add({
+        keyword: keyword,
+        user_id: 1,
+        add_time: parseInt(new Date().getTime() / 1000)
+      });
+
     }
 
     if (!think.isEmpty(brandId)) {
@@ -166,9 +174,9 @@ export default class extends Base {
     let categoryIds = await goodsQuery.where(whereMap).getField('category_id', 10000);
     if (!think.isEmpty(categoryIds)) {
       //查找二级分类的parent_id
-      let parentIds = await this.model('category').where({id: {'in': categoryIds}}).getField('parent_id', 10000);
+      let parentIds = await this.model('category').where({ id: { 'in': categoryIds } }).getField('parent_id', 10000);
       //一级分类
-      let parentCategory = await this.model('category').field(['id', 'name']).order({'sort_order': 'asc'}).where({'id': {'in': parentIds}}).select();
+      let parentCategory = await this.model('category').field(['id', 'name']).order({ 'sort_order': 'asc' }).where({ 'id': { 'in': parentIds } }).select();
 
       if (!think.isEmpty(parentCategory)) {
         filterCategory = filterCategory.concat(parentCategory);
@@ -209,19 +217,19 @@ export default class extends Base {
     let goodsQuery = this.model('goods');
 
     if (!think.isEmpty(categoryId)) {
-      goodsQuery.where({category_id: {'in': await this.model('category').getChildCategoryId(categoryId)}});
+      goodsQuery.where({ category_id: { 'in': await this.model('category').getChildCategoryId(categoryId) } });
     }
 
     if (!think.isEmpty(isNew)) {
-      goodsQuery.where({is_new: isNew});
+      goodsQuery.where({ is_new: isNew });
     }
 
     if (!think.isEmpty(isHot)) {
-      goodsQuery.where({is_hot: isHot});
+      goodsQuery.where({ is_hot: isHot });
     }
 
     if (!think.isEmpty(keyword)) {
-      goodsQuery.where({name: {'like': `%${keyword}%`}});
+      goodsQuery.where({ name: { 'like': `%${keyword}%` } });
     }
 
     let filterCategory = [{
@@ -233,9 +241,9 @@ export default class extends Base {
     let categoryIds = await goodsQuery.getField('category_id', 10000);
     if (!think.isEmpty(categoryIds)) {
       //查找二级分类的parent_id
-      let parentIds = await this.model('category').where({id: {'in': categoryIds}}).getField('parent_id', 10000);
+      let parentIds = await this.model('category').where({ id: { 'in': categoryIds } }).getField('parent_id', 10000);
       //一级分类
-      let parentCategory = await this.model('category').field(['id', 'name']).order({'sort_order': 'asc'}).where({'id': {'in': parentIds}}).select();
+      let parentCategory = await this.model('category').field(['id', 'name']).order({ 'sort_order': 'asc' }).where({ 'id': { 'in': parentIds } }).select();
 
       if (!think.isEmpty(parentCategory)) {
         filterCategory = filterCategory.concat(parentCategory);
@@ -284,14 +292,14 @@ export default class extends Base {
 
     const model = this.model('goods');
     const goodsId = this.get('id');
-    let relatedGoodsIds = await this.model('related_goods').where({goods_id: goodsId}).getField('related_goods_id');
+    let relatedGoodsIds = await this.model('related_goods').where({ goods_id: goodsId }).getField('related_goods_id');
     let relatedGoods = null;
     if (think.isEmpty(relatedGoodsIds)) {
       //查找同分类下的商品
-      let goodsCategory = await model.where({id: goodsId}).find();
-      relatedGoods = await model.where({category_id: goodsCategory.category_id}).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
+      let goodsCategory = await model.where({ id: goodsId }).find();
+      relatedGoods = await model.where({ category_id: goodsCategory.category_id }).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
     } else {
-      relatedGoods = await model.where({id: ['IN', relatedGoodsIds]}).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
+      relatedGoods = await model.where({ id: ['IN', relatedGoodsIds] }).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
     }
 
     return this.success({
@@ -305,7 +313,7 @@ export default class extends Base {
    */
   async countAction() {
 
-    let goodsCount = await this.model('goods').where({is_delete: 0, is_on_sale: 1}).count('id');
+    let goodsCount = await this.model('goods').where({ is_delete: 0, is_on_sale: 1 }).count('id');
 
     return this.success({
       goodsCount: goodsCount,

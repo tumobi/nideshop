@@ -12,7 +12,7 @@ export default class extends Base {
     let categoryId = this.get('id');
 
     let model = this.model('category');
-    let data = await model.limit(10).select();
+    let data = await model.limit(10).where({parent_id: 0}).select();
 
     let currentCategory = null;
     if (categoryId) {
@@ -44,7 +44,6 @@ export default class extends Base {
     if (categoryId) {
       currentCategory = await model.where({'id' : categoryId}).find();
     }
-
     //获取子分类数据
     if (currentCategory && currentCategory.id) {
       currentCategory.subCategoryList = await model.where({'parent_id': currentCategory.id}).select();
