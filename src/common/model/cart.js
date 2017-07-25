@@ -9,7 +9,7 @@ export default class extends think.model.base {
    * @returns {Promise.<*>}
    */
   async getGoodsList(){
-    return await this.model('cart').where({user_id: 1, session_id: 1}).select();
+    return await this.model('cart').where({user_id: think.userId, session_id: 1}).select();
   }
 
   /**
@@ -17,7 +17,7 @@ export default class extends think.model.base {
    * @returns {Promise.<*>}
    */
   async getCheckedGoodsList(){
-    return await this.model('cart').where({user_id: 1, session_id: 1, checked: 1}).select();
+    return await this.model('cart').where({user_id: think.userId, session_id: 1, checked: 1}).select();
   }
 
     /**
@@ -25,6 +25,6 @@ export default class extends think.model.base {
      * @returns {Promise.<*>}
      */
   async clearBuyGoods(){
-      return await this.model('cart').where({user_id: 1, session_id: 1, checked: 1}).delete();
+      return await this.model('cart').where({user_id: think.userId, session_id: 1, checked: 1}).delete();
   }
 }

@@ -12,6 +12,7 @@
     "babel-runtime": "6.x.x",
     "cheerio": "^0.22.0",
     "gm": "^1.23.0",
+    "jsonwebtoken": "^7.4.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "redis": "^2.3.0",

@@ -9,7 +9,7 @@ export default class extends Base {
    * @returns {Promise.<{cartList: *, cartTotal: {goodsCount: number, goodsAmount: number, checkedGoodsCount: number, checkedGoodsAmount: number}}>}
    */
   async getCart(){
-    let cartList = await this.model('cart').where({user_id: 1, session_id: 1}).select();
+    let cartList = await this.model('cart').where({user_id: think.userId, session_id: 1}).select();
 
     //获取购物车统计信息
     let goodsCount = 0;
@@ -90,7 +90,7 @@ export default class extends Base {
         list_pic_url: goodsInfo.list_pic_url,
         number: number,
         session_id: 1,
-        user_id: 1,
+        user_id: think.userId,
         retail_price: productInfo.retail_price,
         market_price: productInfo.retail_price,
         goods_specifition_name_value: goodsSepcifitionValue.join(';'),
@@ -238,7 +238,7 @@ export default class extends Base {
     let couponId = this.get('couponId');    //使用的优惠券id
 
     //选择的收货地址
-    let checkedAddress = await this.model('address').where({is_default: 1}).find();
+    let checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
     if ( !think.isEmpty(checkedAddress)) {
       checkedAddress.province_name = await this.model('region').getRegionName(checkedAddress.province_id);
       checkedAddress.city_name = await this.model('region').getRegionName(checkedAddress.city_id);
@@ -256,7 +256,7 @@ export default class extends Base {
     });
 
 
-    //获取可用的优惠券信息
+    //获取可用的优惠券信息，功能还示实现
     let couponList = await this.model('user_coupon').select();
     let couponPrice = 0.00;  //使用优惠券减免的金额
 

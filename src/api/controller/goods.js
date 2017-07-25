@@ -68,7 +68,7 @@ export default class extends Base {
 
 
     //当前用户是否收藏
-    let userHasCollect = await this.model('collect').isUserHasCollect(1, 0, goodsId);
+    let userHasCollect = await this.model('collect').isUserHasCollect(think.userId, 0, goodsId);
 
     //记录用户的足迹 TODO
     await await this.model('footprint').addFootprint(goodsId);
@@ -140,7 +140,7 @@ export default class extends Base {
       //添加到搜索历史
       let keywords = await this.model('search_history').add({
         keyword: keyword,
-        user_id: 1,
+        user_id: think.userId,
         add_time: parseInt(new Date().getTime() / 1000)
       });
 

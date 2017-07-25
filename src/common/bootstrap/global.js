@@ -22,5 +22,5 @@ global.getTime = function () {
 };
 
 global.getLoginUserId = function () {
-  return 1;
+  return think.userId 
 };

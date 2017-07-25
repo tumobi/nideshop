@@ -13,7 +13,7 @@ export default class extends Base {
     //取出热闹关键词
     let hotKeywordList = await this.model('keywords').distinct('keyword').field(['keyword', 'is_hot']).limit(10).select();
 
-    let historyKeywordList = await this.model('search_history').distinct('keyword').where({ user_id: 1 }).limit(10).getField('keyword');
+    let historyKeywordList = await this.model('search_history').distinct('keyword').where({ user_id: think.userId }).limit(10).getField('keyword');
 
     return this.success({
       defaultKeyword: defaultKeyword,
@@ -30,7 +30,7 @@ export default class extends Base {
   }
 
   async clearhistoryAction() {
-    let historyKeywordList = await this.model('search_history').where({ user_id: 1 }).delete();
+    let historyKeywordList = await this.model('search_history').where({ user_id: think.userId }).delete();
     return this.success();
   }
 }

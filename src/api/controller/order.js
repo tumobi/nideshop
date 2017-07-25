@@ -21,7 +21,7 @@ export default class extends Base {
      */
     async listAction() {
 
-        let orderList = await this.model('order').where({user_id: 1}).page(1, 10).countSelect();
+        let orderList = await this.model('order').where({user_id: think.userId}).page(1, 10).countSelect();
 
         let newOrderList = [];
         for (let item of orderList.data) {
@@ -50,7 +50,7 @@ export default class extends Base {
 
     async detailAction() {
         let orderId = this.get('orderId');
-        let orderInfo = await this.model('order').where({user_id: 1, id: orderId}).find();
+        let orderInfo = await this.model('order').where({user_id: think.userId, id: orderId}).find();
 
         if (think.isEmpty(orderInfo)) {
             return this.fail('订单不存在');
@@ -102,7 +102,7 @@ export default class extends Base {
         let freightPrice = 0.00;
 
         //获取要购买的商品
-        let checkedGoodsList = await this.model('cart').where({user_id: 1, session_id: 1, checked: 1}).select();
+        let checkedGoodsList = await this.model('cart').where({user_id: think.userId, session_id: 1, checked: 1}).select();
         if (think.isEmpty(checkedGoodsList)) {
             return this.fail('请选择商品');
         }
@@ -130,7 +130,7 @@ export default class extends Base {
         let orderInfo = {
 
             order_sn: this.model('order').generateOrderNumber(),
-            user_id: 1,
+            user_id: think.userId,
 
             //收货地址和运费
             consignee: checkedAddress.name,

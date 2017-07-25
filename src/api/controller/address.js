@@ -8,7 +8,7 @@ export default class extends Base {
    * @return {Promise} []
    */
   async listAction(){
-    let addressList = await this.model('address').where({user_id: 1}).select();
+    let addressList = await this.model('address').where({user_id: think.userId}).select();
     let itemKey = 0;
     for ( let addressItem of addressList) {
         addressList[itemKey].province_name = await this.model('region').getRegionName(addressItem.province_id);
@@ -29,7 +29,7 @@ export default class extends Base {
    */
   async detailAction(){
     let addressId = this.get('id');
-    let addressInfo = await this.model('address').where({user_id: 1, id: addressId}).find();
+    let addressInfo = await this.model('address').where({user_id: think.userId, id: addressId}).find();
     if ( !think.isEmpty(addressInfo)) {
       addressInfo.province_name = await this.model('region').getRegionName(addressInfo.province_id);
       addressInfo.city_name = await this.model('region').getRegionName(addressInfo.city_id);
@@ -55,19 +55,19 @@ export default class extends Base {
       city_id: this.post('city_id'),
       district_id: this.post('district_id'),
       address: this.post('address'),
-      user_id: 1,
+      user_id: getLoginUserId(),
       is_default: this.post('is_default') == true ? 1 : 0
     };
 
     if (think.isEmpty(addressId)) {
       addressId = await this.model('address').add(addressData);
     } else {
-      await this.model('address').where({id: addressId, user_id: 1}).update(addressData);
+      await this.model('address').where({id: addressId, user_id: think.userId}).update(addressData);
     }
 
     //如果设置为默认，则取消其它的默认
     if (this.post('is_default') == true) {
-        await this.model('address').where({id: ['<>', addressId], user_id: 1}).update({
+        await this.model('address').where({id: ['<>', addressId], user_id: think.userId}).update({
             is_default: 0
         });
     }
@@ -84,7 +84,7 @@ export default class extends Base {
   async deleteAction(){
     let addressId = this.post('id');
 
-    await this.model('address').where({id: addressId, user_id: 1}).delete();
+    await this.model('address').where({id: addressId, user_id: think.userId}).delete();
 
     return this.success('删除成功');
   }
