@@ -4,12 +4,6 @@ import Base from './base.js';
 
 export default class extends Base {
 
-  async __before() {
-    if (think.userId <= 0) {
-      return this.fail(401, '请先登录');
-    }
-  }
-
   /**
    * index action
    * @return {Promise} []

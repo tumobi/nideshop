@@ -7,20 +7,22 @@ export default class extends think.controller.base {
    */
   async __before() {
 
+    //根据token值获取用户id
     think.token = this.header('X-Nideshop-Token') || '';
-    if (!think.isEmpty(think.token)) {
-      let TokenSerivce = this.service('token');
-      let tokenObj = new TokenSerivce();
-      let sessionInfo = await tokenObj.parse();
+    let TokenSerivce = this.service('token');
+    let tokenObj = new TokenSerivce();
+    think.userId = await tokenObj.getUserId();
 
-      console.log(sessionInfo)
-      if (!think.isEmpty(sessionInfo) && sessionInfo.user_id > 0) {
-        think.userId = sessionInfo.user_id;
-      } else {
-        think.userId = 0;
+    const publicController = this.http.config('publicController');
+    const publicAction = this.http.config('publicAction');
+
+    //如果为非公开，则验证用户是否登录
+    console.log(this.http.controller + '/' + this.http.action)
+    if (!publicController.includes(this.http.controller) && !publicAction.includes(this.http.controller + '/' + this.http.action)) {
+      if (think.userId <= 0) {
+        return this.fail(401, '请先登录');
       }
-    } else {
-      think.userId = 0;
     }
+
   }
 }
