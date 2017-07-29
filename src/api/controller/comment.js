@@ -3,17 +3,36 @@
 import Base from './base.js';
 
 export default class extends Base {
-    /**
-     * index action
-     * @return {Promise} []
-     */
-    indexAction() {
-        //auto render template file index_index.html
-        return this.display();
-    }
 
-    async addAction() {
-        return this.success('评论添加成功');
+    /**
+     * 评论类型说明：
+     * 0 商品
+     * 1 专题
+     */
+
+    /**
+     * 发表评论
+     * @returns {Promise.<*|PreventPromise|void|Promise>}
+     */
+    async postAction() {
+
+        let typeId = this.post('typeId');
+        let valueId = this.post('valueId');
+        let content = this.post('content');
+        let buffer = new Buffer(content);
+        let insertId  = await this.model('comment').add({
+            type_id: typeId,
+            value_id: valueId,
+            content: buffer.toString('base64'),
+            add_time: getTime(),
+            user_id: getLoginUserId()
+        });
+
+        if (insertId ) {
+            return this.success('评论添加成功');
+        } else {
+            return this.fail('评论保存失败');
+        }
     }
 
     async countAction() {
@@ -50,7 +69,10 @@ export default class extends Base {
         let comments = [];
 
         if (showType != 1) {
-            comments = await this.model('comment').where({type_id: typeId, value_id: valueId}).page(page, size).countSelect();
+            comments = await this.model('comment').where({
+                type_id: typeId,
+                value_id: valueId
+            }).page(page, size).countSelect();
 
         } else {
             comments = await this.model('comment').alias('comment')
@@ -73,12 +95,7 @@ export default class extends Base {
             comment.value_id = commentItem.value_id;
             comment.id = commentItem.id;
             comment.add_time = addTime.getFullYear() + '-' + addTime.getMonth() + '-' + addTime.getDay() + ' ' + addTime.getHours() + ':' + addTime.getMinutes() + ':' + addTime.getSeconds();
-            // comment.user_id = commentItem.user_id;
-            comment.user_info = {
-                username: '哈**哈',
-                avatar: 'http://nos.netease.com/mail-online/df467c7b6ce60bf9491d361c10e5e797/mail180x180.jpg',
-                level: 'V3'
-            };
+            comment.user_info = await this.model('user').field(['username', 'avatar', 'nickname']).where({id: commentItem.user_id}).find();
             comment.pic_list = await this.model('comment_picture').where({comment_id: commentItem.id}).select();
             commentList.push(comment);
         }
