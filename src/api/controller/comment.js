@@ -89,12 +89,11 @@ export default class extends Base {
         let commentList = [];
         for (let commentItem of comments.data) {
             let comment = {};
-            let addTime = new Date(commentItem.add_time);
             comment.content = new Buffer(commentItem.content, 'base64').toString();
             comment.type_id = commentItem.type_id;
             comment.value_id = commentItem.value_id;
             comment.id = commentItem.id;
-            comment.add_time = addTime.getFullYear() + '-' + addTime.getMonth() + '-' + addTime.getDay() + ' ' + addTime.getHours() + ':' + addTime.getMinutes() + ':' + addTime.getSeconds();
+            comment.add_time = think.datetime(new Date(commentItem.add_time * 1000));
             comment.user_info = await this.model('user').field(['username', 'avatar', 'nickname']).where({id: commentItem.user_id}).find();
             comment.pic_list = await this.model('comment_picture').where({comment_id: commentItem.id}).select();
             commentList.push(comment);
