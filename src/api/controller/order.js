@@ -158,7 +158,7 @@ export default class extends Base {
 
         //开启事务，插入订单信息和订单商品
         let orderId = await this.model('order').add(orderInfo);
-
+        orderInfo.id = orderId;
         if (!orderId) {
             return this.fail('订单提交失败');
         }
@@ -185,7 +185,7 @@ export default class extends Base {
 
         await this.model('cart').clearBuyGoods();
 
-        return this.success('订单提交成功');
+        return this.success({orderInfo: orderInfo});
     }
 
 }
