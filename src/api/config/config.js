@@ -1,13 +1,8 @@
-'use strict';
-/**
- * config
- */
-export default {
-  //key: value
-
-  //可以公开访问的Controller
+// default config
+module.exports = {
+  // 可以公开访问的Controller
   publicController: [
-    //格式为controller
+    // 格式为controller
     'index',
     'catalog',
     'topic',
@@ -15,12 +10,12 @@ export default {
     'goods',
     'brand',
     'search',
-    'region',
+    'region'
   ],
 
-  //可以公开访问的Action
+  // 可以公开访问的Action
   publicAction: [
-    //格式为： controller+action
+    // 格式为： controller+action
     'comment/list',
     'comment/count',
     'cart/index',
@@ -28,6 +23,6 @@ export default {
     'cart/checked',
     'cart/update',
     'cart/delete',
-    'cart/goodscount',
+    'cart/goodscount'
   ]
 };

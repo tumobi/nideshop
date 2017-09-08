@@ -1,15 +1,5 @@
-'use strict';
-/**
- * logic
- * @param  {} []
- * @return {}     []
- */
-export default class extends think.logic.base {
-  /**
-   * index action logic
-   * @return {} []
-   */
-  indexAction(){
-   
+module.exports = class extends think.Logic {
+  indexAction() {
+
   }
-}
+};

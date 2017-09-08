@@ -3,33 +3,42 @@
   "description": "application created by thinkjs",
   "version": "1.0.0",
   "scripts": {
-    "start": "node www/development.js",
-    "compile": "babel src/ --out-dir app/",
-    "watch-compile": "node -e \"console.log('<npm run watch-compile> no longer need, use <npm start> command direct.');console.log();\"",
-    "watch": "npm run watch-compile"
+    "start": "node development.js",
+    "compile": "babel --no-babelrc src/ --presets think-node --out-dir app/",
+    "lint": "eslint src/",
+    "lint-fix": "eslint --fix src/"
   },
   "dependencies": {
-    "babel-runtime": "6.x.x",
-    "cheerio": "^0.22.0",
-    "gm": "^1.23.0",
-    "jsonwebtoken": "^7.4.1",
+    "jsonwebtoken": "^8.0.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "redis": "^2.3.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
-    "source-map-support": "0.4.0",
-    "think-cors": "^1.1.2",
-    "thinkjs": "2.2.x",
-    "uid-safe": "^2.1.4"
+    "think-cache": "^1.0.0",
+    "think-cache-file": "^1.0.8",
+    "think-logger3": "^1.0.0",
+    "think-model": "^1.0.0",
+    "think-model-mysql": "^1.0.0",
+    "think-session": "^1.0.0",
+    "think-session-file": "^1.0.5",
+    "think-view": "^1.0.0",
+    "think-view-nunjucks": "^1.0.1",
+    "thinkjs": "^3.0.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-preset-stage-1": "^6.16.0",
-    "babel-plugin-transform-runtime": "^6.15.0",
-    "babel-core": "^6.20.0"
+    "babel-cli": "^6.24.1",
+    "babel-preset-think-node": "^1.0.0",
+    "node-notifier": "^5.0.2",
+    "think-watcher": "^3.0.0",
+    "think-inspect": "0.0.2",
+    "think-babel": "^1.0.3",
+    "eslint": "^4.2.0",
+    "eslint-config-think": "^1.0.0"
   },
   "repository": "",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "readmeFilename": "README.md"
 }

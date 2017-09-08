@@ -6,9 +6,6 @@
 + 服务端api基于Ｎode.js+ThinkJS+MySQL
 + 计划添加基于Vue.js的后台管理系统、PC版、Ｗap版
 
-**注意：当前版本功能还未完善，请勿商用。**
-
-
 本项目需要配合微信小程序端使用，GitHub: [https://github.com/tumobi/nideshop-mini-program](https://github.com/tumobi/nideshop-mini-program)
 
 
@@ -54,7 +51,7 @@ npm start
 
 ### 线上部署
 
-+ 没有域名部署参考文档：[通过新浪云部署Node.js微信小程序商城（不用买域名、不用备案、不用配置https）](http://www.jianshu.com/p/78a0f5f424e1)
++ 没有域名部署参考文档：[通过新浪云部署NideShop微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
 
 + 如有域名且已备案，可参考：[阿里云Ubuntu 16.04 下部署Node.js+MySQL微信小程序商城](http://www.jianshu.com/p/38d13a7c1b78)
 
