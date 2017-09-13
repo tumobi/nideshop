@@ -1,7 +1,4 @@
-'use strict';
-/**
- * config
- */
-export default {
-  //key: value
+// default config
+module.exports = {
+
 };

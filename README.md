@@ -49,7 +49,11 @@ npm start
 ```
 访问http://127.0.0.1:8360/
 
-线上部署参考文档：[通过新浪云部署NideShop微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
+### 线上部署
+
++ 没有域名部署参考文档：[通过新浪云部署NideShop微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
+
++ 如有域名且已备案，可参考：[阿里云Ubuntu 16.04 下部署Node.js+MySQL微信小程序商城](http://www.jianshu.com/p/38d13a7c1b78)
 
 
 ### 微信小程序客户端截图

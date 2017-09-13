@@ -1,29 +1,26 @@
-'use strict';
+const Base = require('./base.js');
 
-import Base from './base.js';
-
-export default class extends Base {
+module.exports = class extends Base {
   /**
    * 获取分类栏目数据
    * @returns {Promise.<Promise|void|PreventPromise>}
    */
-  async indexAction(){
+  async indexAction() {
+    const categoryId = this.get('id');
 
-    let categoryId = this.get('id');
-
-    let model = this.model('category');
-    let data = await model.limit(10).where({parent_id: 0}).select();
+    const model = this.model('category');
+    const data = await model.limit(10).where({parent_id: 0}).select();
 
     let currentCategory = null;
     if (categoryId) {
-      currentCategory = await model.where({'id' : categoryId}).find();
+      currentCategory = await model.where({'id': categoryId}).find();
     }
 
     if (think.isEmpty(currentCategory)) {
       currentCategory = data[0];
     }
 
-    //获取子分类数据
+    // 获取子分类数据
     if (currentCategory && currentCategory.id) {
       currentCategory.subCategoryList = await model.where({'parent_id': currentCategory.id}).select();
     }
@@ -34,17 +31,15 @@ export default class extends Base {
     });
   }
 
-  async currentAction(){
-
-    let categoryId = this.get('id');
-
-    let model = this.model('category');
+  async currentAction() {
+    const categoryId = this.get('id');
+    const model = this.model('category');
 
     let currentCategory = null;
     if (categoryId) {
-      currentCategory = await model.where({'id' : categoryId}).find();
+      currentCategory = await model.where({'id': categoryId}).find();
     }
-    //获取子分类数据
+    // 获取子分类数据
     if (currentCategory && currentCategory.id) {
       currentCategory.subCategoryList = await model.where({'parent_id': currentCategory.id}).select();
     }
@@ -53,4 +48,4 @@ export default class extends Base {
       currentCategory: currentCategory
     });
   }
-}
+};

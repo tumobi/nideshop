@@ -1,10 +1,9 @@
 {
   "apps": [{
-    "name": "you_thinkjs",
-    "script": "www/production.js",
-    "cwd": "/home/jiaciwang/Code/tmp/you_thinkjs",
-    "exec_mode": "cluster",
-    "instances": 0,
+    "name": "nideshop",
+    "script": "production.js",
+    "cwd": "/var/www/nideshop",
+    "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
     "node_args": [],
