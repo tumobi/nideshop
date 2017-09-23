@@ -20,25 +20,32 @@ CREATE SCHEMA `nideshop` DEFAULT CHARACTER SET utf8mb4 ;
 ```
 > 注意数据库字符编码为utf8mb4 
 + 更改数据库配置
-  src/common/config/db.js
-  ```
-  export default {
-    type: 'mysql',
-    adapter: {
-        mysql: {
-        host: '127.0.0.1',
-        port: '3306',
-        database: 'nideshop',
-        user: 'root',
-        password: 'root',
-        prefix: 'nideshop_',
-        encoding: 'utf8'
-        },
-        mongo: {
-
-        }
-    }
-  };
+  src/common/config/adapter.js
+  
+```
+  /**
+ * model adapter config
+ * @type {Object}
+ */
+exports.model = {
+  type: 'mysql',
+  common: {
+    logConnect: isDev,
+    logSql: isDev,
+    logger: msg => think.logger.info(msg)
+  },
+  mysql: {
+    handle: mysql,
+    database: 'nideshop',
+    prefix: 'nideshop_',
+    encoding: 'utf8mb4',
+    host: '127.0.0.1',
+    port: '3306',
+    user: 'root',
+    password: 'root',
+    dateStrings: true
+  }
+};
 
   ```
 
@@ -51,7 +58,7 @@ npm start
 
 ### 线上部署
 
-+ 没有域名部署参考文档：[通过新浪云部署NideShop微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
++ 没有域名部署参考文档：[不用买域名、不用备案、不用配置https快速部署Node.js微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/ecd0c85e8376)
 
 + 如有域名且已备案，可参考：[阿里云Ubuntu 16.04 下部署Node.js+MySQL微信小程序商城](http://www.jianshu.com/p/38d13a7c1b78)
 
