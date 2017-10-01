@@ -21,8 +21,6 @@
     "think-logger3": "^1.0.0",
     "think-model": "^1.0.0",
     "think-model-mysql": "^1.0.0",
-    "think-session": "^1.0.0",
-    "think-session-file": "^1.0.5",
     "thinkjs": "^3.0.0"
   },
   "devDependencies": {
