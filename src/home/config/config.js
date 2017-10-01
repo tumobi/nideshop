@@ -1,4 +1,0 @@
-// default config
-module.exports = {
-
-};
