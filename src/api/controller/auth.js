@@ -25,8 +25,8 @@ module.exports = class extends Base {
       qs: {
         grant_type: 'authorization_code',
         js_code: code,
-        secret: '00a2749d6f15e1979194d80b777e6adf',
-        appid: 'wx262f4ac3b1c477dd'
+        secret: '01a41c02932b4e80ac7e6219ff1782fa',
+        appid: 'wx21f857c791a4515d'
       }
     };
 
