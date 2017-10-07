@@ -1,6 +1,6 @@
 {
-  "name": "thinkjs-application",
-  "description": "application created by thinkjs",
+  "name": "nideshop",
+  "description": "nideshop - open source mini program shop",
   "version": "1.0.0",
   "scripts": {
     "start": "node development.js",
