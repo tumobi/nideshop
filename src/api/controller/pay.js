@@ -1,17 +1,14 @@
+/* eslint-disable no-multi-spaces */
 const Base = require('./base.js');
-const rp = require('request-promise');
 
 module.exports = class extends Base {
-  // 支付类型 1 微信支付 2支付宝
-  // TODO 支付功能由于没有公司账号和微信支付账号，所以没有经过测试，如您可以提供相关账号测试，可联系 tumobi@163.com
 
   /**
    * 获取支付的请求参数
    * @returns {Promise<PreventPromise|void|Promise>}
    */
-  async payPrepayAction() {
+  async prepayAction() {
     const orderId = this.get('orderId');
-    // const payType = this.get('payType');
 
     const orderInfo = await this.model('order').where({id: orderId}).find();
     if (think.isEmpty(orderInfo)) {
@@ -20,42 +17,44 @@ module.exports = class extends Base {
     if (parseInt(orderInfo.pay_status) !== 0) {
       return this.fail(400, '订单已支付，请不要重复操作');
     }
+    const openid = await this.model('user').where({id: orderInfo.user_id}).getField('weixin_openid', true);
+    if (think.isEmpty(openid)) {
+      return this.fail('微信支付失败');
+    }
+    const WeixinSerivce = this.service('weixin', 'api');
+    try {
+      const returnParams = await WeixinSerivce.createUnifiedOrder({
+        openid: openid,
+        body: '订单编号：' + orderInfo.order_sn,
+        out_trade_no: orderInfo.order_sn,
+        total_fee: parseInt(orderInfo.actual_price * 100),
+        spbill_create_ip: ''
+      });
+      return this.success(returnParams);
+    } catch (err) {
+      return this.fail('微信支付失败');
+    }
+  }
 
-    // 微信支付统一调用接口，body参数请查看微信支付文档：https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_sl_api.php?chapter=9_1
-    const options = {
-      method: 'POST',
-      url: 'https://api.mch.weixin.qq.com/pay/unifiedorder',
-      body: {
-        appid: 'payload',
-        mch_id: '',
-        sub_appid: '',
-        sub_mch_id: '',
-        device_info: '',
-        nonce_str: think.uuid(32),
-        sign: '',
-        sign_type: 'MD5',
-        body: '',
-        out_trade_no: '',
-        total_fee: orderInfo.actual_price * 100,
-        spbill_create_ip: '',
-        notify_url: '',
-        trade_type: 'JSAPI',
-        openid: '',
-        sub_openid: ''
-      }
-    };
-    const payParam = await rp(options);
-    if (payParam) {
-
+  async notifyAction() {
+    const WeixinSerivce = this.service('weixin', 'api');
+    const result = WeixinSerivce.payNotify(this.post('xml'));
+    console.log('WeixinSerivce.payNotify ' + result);
+    if (!result) {
+      return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[支付失败]]></return_msg></xml>`;
     }
 
-    // 统一返回成功，方便测试
-    return this.success({
-      'timeStamp': this.getTime(),
-      'nonceStr': think.uuid(16),
-      'package': 'prepay_id=wx201410272009395522657a690389285100',
-      'signType': 'MD5',
-      'paySign': 'jdsdlsdsd'
-    });
+    const orderModel = this.model('order');
+    const orderInfo = await orderModel.getOrderByOrderSn(result.out_trade_no);
+    if (think.isEmpty(orderInfo)) {
+      return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+    }
+
+    if (orderModel.updatePayStatus(orderInfo.id, 2)) {
+    } else {
+      return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
+    }
+
+    return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
   }
 };

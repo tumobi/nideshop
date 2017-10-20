@@ -3,15 +3,6 @@ const rp = require('request-promise');
 const _ = require('lodash');
 
 module.exports = class extends Base {
-  /**
-   * index action
-   * @return {Promise} []
-   */
-  async indexAction() {
-    const avatarPath = think.RESOURCE_PATH + '/static/user/avatar/1.' + _.last(_.split('https://img6.bdstatic.com/img/image/smallpic/liutaoxiaotu.jpg', '.'));
-    return this.success(avatarPath);
-  }
-
   async loginByWeixinAction() {
     const code = this.post('code');
     const fullUserInfo = this.post('userInfo');
@@ -43,7 +34,7 @@ module.exports = class extends Base {
       return this.fail('登录失败');
     }
 
-    //  析用户数据
+    // 解释用户数据
     const WeixinSerivce = this.service('weixin', 'api');
     const weixinUserInfo = await WeixinSerivce.decryptUserInfoData(sessionData.session_key, fullUserInfo.encryptedData, fullUserInfo.iv);
     if (think.isEmpty(weixinUserInfo)) {
