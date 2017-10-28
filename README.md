@@ -49,6 +49,7 @@ exports.model = {
 
   ```
 + 填写微信登录和微信支付配置
+src/common/config/config.js
 ```
 // default config
 module.exports = {
