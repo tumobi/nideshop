@@ -23,6 +23,7 @@ module.exports = {
     'cart/checked',
     'cart/update',
     'cart/delete',
-    'cart/goodscount'
+    'cart/goodscount',
+    'pay/notify'
   ]
 };
