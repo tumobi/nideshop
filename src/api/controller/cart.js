@@ -89,7 +89,7 @@ module.exports = class extends Base {
         session_id: 1,
         user_id: think.userId,
         retail_price: productInfo.retail_price,
-        market_price: productInfo.retail_price,
+        market_price: productInfo.market_price,
         goods_specifition_name_value: goodsSepcifitionValue.join(';'),
         goods_specifition_ids: productInfo.goods_specification_ids,
         checked: 1
