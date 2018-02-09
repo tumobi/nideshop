@@ -1,5 +1,4 @@
 const Base = require('./base.js');
-const gm = require('gm').subClass({imageMagick: true});
 const fs = require('fs');
 
 module.exports = class extends Base {
@@ -18,17 +17,6 @@ module.exports = class extends Base {
       name: 'brand_pic',
       fileUrl: 'http://127.0.0.1:8360' + filename
     });
-    // gm(brandFile.path)
-    //   .resize(750, 420, '!')
-    //   .write(think.RESOURCE_PATH + filename, function (err) {
-    //     if (err) {
-    //       return that.fail('图片上传失败');
-    //     }
-    //     return that.success({
-    //       name: 'brand_pic',
-    //       fileUrl: 'http://127.0.0.1:8360' + filename
-    //     });
-    //   });
   }
 
   async brandNewPicAction() {
@@ -47,17 +35,6 @@ module.exports = class extends Base {
       name: 'brand_new_pic',
       fileUrl: 'http://127.0.0.1:8360' + filename
     });
-    // gm(brandFile.path)
-    //   .resize(375, 252, '!')
-    //   .write(think.ROOT_PATH + '/www' + filename, function(err) {
-    //     if (err) {
-    //       return that.fail('上传失败');
-    //     }
-    //     return that.success({
-    //       name: 'brand_new_pic',
-    //       fileUrl: 'http://127.0.0.1:8360' + filename
-    //     });
-    //   });
   }
 
   async categoryWapBannerPicAction() {

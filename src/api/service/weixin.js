@@ -125,7 +125,6 @@ module.exports = class extends think.Service {
       }
     }
     if (notifyObj.return_code !== 'SUCCESS' || notifyObj.result_code !== 'SUCCESS') {
-      console.log('return_code false');
       return false;
     }
     const signString = this.signQuery(this.buildQuery(notifyObj));
