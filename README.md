@@ -20,21 +20,12 @@ CREATE SCHEMA `nideshop` DEFAULT CHARACTER SET utf8mb4 ;
 ```
 > 注意数据库字符编码为utf8mb4 
 + 更改数据库配置
-  src/common/config/adapter.js
+  src/common/config/database.js
   
 ```
-  /**
- * model adapter config
- * @type {Object}
- */
-exports.model = {
-  type: 'mysql',
-  common: {
-    logConnect: isDev,
-    logSql: isDev,
-    logger: msg => think.logger.info(msg)
-  },
-  mysql: {
+const mysql = require('think-model-mysql');
+
+module.exports = {
     handle: mysql,
     database: 'nideshop',
     prefix: 'nideshop_',
@@ -42,12 +33,11 @@ exports.model = {
     host: '127.0.0.1',
     port: '3306',
     user: 'root',
-    password: 'root',
+    password: '你的密码',
     dateStrings: true
-  }
 };
+```
 
-  ```
 + 填写微信登录和微信支付配置
 src/common/config/config.js
 ```
