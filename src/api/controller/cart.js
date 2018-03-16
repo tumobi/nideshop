@@ -257,7 +257,7 @@ module.exports = class extends Base {
     });
 
     // 获取可用的优惠券信息，功能还示实现
-    const couponList = await this.model('user_coupon').select();
+    const couponList = await this.model('user_coupon').where({user_id: think.userId}).select();
     const couponPrice = 0.00; // 使用优惠券减免的金额
 
     // 计算订单的费用
