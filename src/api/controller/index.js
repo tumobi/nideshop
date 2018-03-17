@@ -2,6 +2,7 @@ const Base = require('./base.js');
 
 module.exports = class extends Base {
   async indexAction() {
+    const userId = this.header('muses-platform-userid') || 0;
     const banner = await this.model('ad').where({ad_position_id: 1}).select();
     const channel = await this.model('channel').order({sort_order: 'asc'}).select();
     const newGoods = await this.model('goods').field(['id', 'name', 'list_pic_url', 'retail_price']).where({is_new: 1}).limit(4).select();
@@ -9,7 +10,7 @@ module.exports = class extends Base {
     const brandList = await this.model('brand').where({is_new: 1}).order({new_sort_order: 'asc'}).limit(4).select();
     const topicList = await this.model('topic').limit(3).select();
 
-    const categoryList = await this.model('category').where({parent_id: 0, name: ['<>', '推荐']}).select();
+    const categoryList = await this.model('category').where({parent_id: 0, user_id: userId}).select();
     const newCategoryList = [];
     for (const categoryItem of categoryList) {
       const childCategoryIds = await this.model('category').where({parent_id: categoryItem.id}).getField('id', 100);

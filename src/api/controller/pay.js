@@ -18,6 +18,7 @@ module.exports = class extends Base {
     }
     const openid = await this.model('user').where({ id: orderInfo.user_id }).getField('weixin_openid', true);
     if (think.isEmpty(openid)) {
+        think.logger.warn('找不到openid');
       return this.fail('微信支付失败');
     }
     const WeixinSerivce = this.service('weixin', 'api');
@@ -31,6 +32,7 @@ module.exports = class extends Base {
       });
       return this.success(returnParams);
     } catch (err) {
+      think.logger.error(err);
       return this.fail('微信支付失败');
     }
   }

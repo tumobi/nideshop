@@ -1,5 +1,8 @@
 const Base = require('./base.js');
 const moment = require('moment');
+const axios = require('axios');
+const cryptoUtil = require('muses-wxmp-crypto-util');
+const qs = require('querystring');
 
 module.exports = class extends Base {
   /**
@@ -32,7 +35,7 @@ module.exports = class extends Base {
 
   async detailAction() {
     const orderId = this.get('orderId');
-    const orderInfo = await this.model('order').where({ user_id: 1, id: orderId }).find();
+    const orderInfo = await this.model('order').where({ user_id: think.userId, id: orderId }).find();
 
     if (think.isEmpty(orderInfo)) {
       return this.fail('订单不存在');
@@ -90,22 +93,27 @@ module.exports = class extends Base {
       return this.fail('请选择商品');
     }
 
-    // 统计商品总价
+    // 下单的顾客信息
+    const currUser = await this.model('user').where({ id: think.userId }).find();
+
+    // 统计商品总价及生成订单内容描述
     let goodsTotalPrice = 0.00;
+    let orderDesc = '';
     for (const cartItem of checkedGoodsList) {
       goodsTotalPrice += cartItem.number * cartItem.retail_price;
+      orderDesc += ';' + cartItem.goods_name + ',数量:' + cartItem.number;
     }
 
     // 获取订单使用的优惠券
     const couponId = this.post('couponId');
     const couponPrice = 0.00;
     if (!think.isEmpty(couponId)) {
-
+      // TODO: 当选择有优惠券时做相应的优惠处理
     }
 
     // 订单价格计算
-    const orderTotalPrice = goodsTotalPrice + freightPrice - couponPrice; // 订单的总价
-    const actualPrice = orderTotalPrice - 0.00; // 减去其它支付的金额后，要实际支付的金额
+    const orderTotalPrice = goodsTotalPrice + freightPrice; // 订单的总价
+    const actualPrice = orderTotalPrice - couponPrice; // 减去其它支付的金额后，要实际支付的金额
     const currentTime = parseInt(this.getTime() / 1000);
 
     const orderInfo = {
@@ -119,7 +127,7 @@ module.exports = class extends Base {
       city: checkedAddress.city_id,
       district: checkedAddress.district_id,
       address: checkedAddress.address,
-      freight_price: 0.00,
+      freight_price: freightPrice,
 
       // 留言
       postscript: this.post('postscript'),
@@ -131,9 +139,43 @@ module.exports = class extends Base {
       add_time: currentTime,
       goods_price: goodsTotalPrice,
       order_price: orderTotalPrice,
-      actual_price: actualPrice
+      actual_price: actualPrice,
+      platform_order: ''
     };
 
+    // 提交订单信息到platform
+    const submitData = {
+      'orderInfo': orderInfo,
+      'userInfo': currUser,
+      'description': orderDesc,
+      'orderSubject': think.config('appService.appName') + ':' + orderInfo.order_sn
+    };
+
+    // 组织订单数据提交到muses的APP服务，创建platform后台订单
+    const openid = currUser.weixin_openid; // await this.model('user').where({ id: orderInfo.user_id }).getField('weixin_openid', true);
+    if (think.isEmpty(openid)) {
+      return this.fail('请先登入帐户');
+    }
+    const params = {
+      appid: think.config('appService.appid'),
+      openid: openid,
+      orderno: orderInfo.order_sn
+    };
+    const clientSecret = think.config('appService.appKey');
+    const timestamp = new Date().getTime();
+    const sign = cryptoUtil.getSignature(params, timestamp, clientSecret);
+    await axios.post(think.config('appService.host') + '/api/' + think.config('appService.version') +
+        '/orders?' + qs.stringify(params), submitData, {headers: {'Muses-Timestamp': timestamp, 'Muses-Signature': sign}})
+      .then(res => {
+        think.logger.debug('result Json=' + JSON.stringify(res.data));
+        const resJson = res.data;
+        if (resJson.result === false) {
+          return this.fail('创建订单失败');
+        }
+        orderInfo.platform_order = resJson.data.orderNo;
+      });
+
+    think.logger.info('orderInfo Json=' + JSON.stringify(orderInfo));
     // 开启事务，插入订单信息和订单商品
     const orderId = await this.model('order').add(orderInfo);
     orderInfo.id = orderId;

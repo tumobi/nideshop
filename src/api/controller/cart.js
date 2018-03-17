@@ -234,7 +234,7 @@ module.exports = class extends Base {
 
     // 选择的收货地址
     let checkedAddress = null;
-    if (addressId) {
+    if (addressId === 0) {
       checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
     } else {
       checkedAddress = await this.model('address').where({id: addressId, user_id: think.userId}).find();

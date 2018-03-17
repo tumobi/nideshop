@@ -746,7 +746,7 @@ CREATE TABLE `nideshop_order` (
   `add_time` int(11) unsigned NOT NULL DEFAULT '0',
   `confirm_time` int(11) unsigned NOT NULL DEFAULT '0',
   `pay_time` int(11) unsigned NOT NULL DEFAULT '0',
-  `freight_price` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送费用',
+  `freight_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送费用',
   `coupon_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '使用的优惠券id',
   `parent_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `coupon_price` decimal(10,2) NOT NULL DEFAULT '0.00',
