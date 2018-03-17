@@ -32,7 +32,7 @@ module.exports = class extends Base {
 
   async detailAction() {
     const orderId = this.get('orderId');
-    const orderInfo = await this.model('order').where({ user_id: 1, id: orderId }).find();
+    const orderInfo = await this.model('order').where({ user_id: think.userId, id: orderId }).find();
 
     if (think.isEmpty(orderInfo)) {
       return this.fail('订单不存在');
