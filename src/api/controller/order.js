@@ -10,7 +10,8 @@ module.exports = class extends Base {
    * @return {Promise} []
    */
   async listAction() {
-    const orderList = await this.model('order').where({ user_id: think.userId }).page(1, 10).countSelect();
+    const orderList = await this.model('order').where('user_id=' + think.userId + ' and order_status not in (101, 102)')
+      .order({id: 'desc'}).page(1, 10).countSelect();
     const newOrderList = [];
     for (const item of orderList.data) {
       // 订单的商品
@@ -74,6 +75,23 @@ module.exports = class extends Base {
     });
   }
 
+  async cancelAction() {
+    const orderId = this.get('orderId');
+    const orderInfo = await this.model('order').where({ user_id: think.userId, id: orderId }).find();
+
+    if (think.isEmpty(orderInfo)) {
+      return this.fail('订单不存在');
+    }
+
+    orderInfo.province_name = await this.model('region').where({ id: orderInfo.province }).getField('name', true);
+    // 订单可操作的选择,删除，支付，收货，评论，退换货
+    // const handleOption = await this.model('order').getOrderHandleOption(orderId);
+
+    return this.success({
+      orderInfo: orderInfo
+    });
+  }
+
   /**
    * 提交订单
    * @returns {Promise.<void>}
@@ -85,6 +103,9 @@ module.exports = class extends Base {
     if (think.isEmpty(checkedAddress)) {
       return this.fail('请选择收货地址');
     }
+    checkedAddress.province_name = await this.model('region').getRegionName(checkedAddress.province_id);
+    checkedAddress.city_name = await this.model('region').getRegionName(checkedAddress.city_id);
+    checkedAddress.district_name = await this.model('region').getRegionName(checkedAddress.district_id);
     const freightPrice = 0.00;
 
     // 获取要购买的商品
@@ -148,7 +169,9 @@ module.exports = class extends Base {
       'orderInfo': orderInfo,
       'userInfo': currUser,
       'description': orderDesc,
-      'orderSubject': think.config('appService.appName') + ':' + orderInfo.order_sn
+      'orderSubject': think.config('appService.appName') + ':' + orderInfo.order_sn,
+      'deliveryAddress': checkedAddress.province_name + ' ' + checkedAddress.city_name + ' ' +
+      checkedAddress.district_name + ' ' + orderInfo.address + ' ' + orderInfo.consignee
     };
 
     // 组织订单数据提交到muses的APP服务，创建platform后台订单

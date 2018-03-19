@@ -34,7 +34,7 @@ module.exports = class extends think.Model {
     // 1xx表示订单取消和删除等状态 0订单创建成功等待付款，101订单已取消，102订单已删除
     // 2xx表示订单支付状态,201订单已付款，等待发货
     // 3xx表示订单物流相关状态,300订单已发货，301用户确认收货
-    // 4xx表示订单退换货相关的状态,401没有发货，退款402,已收货，退款退货
+    // 4xx表示订单退换货相关的状态,401没有发货，退款402,已收货，退款退货，403退货退款完成
     // 如果订单已经取消或是已完成，则可删除和再次购买
     if (orderInfo.order_status === 101) {
       handleOption.delete = true;
@@ -72,10 +72,34 @@ module.exports = class extends think.Model {
   async getOrderStatusText(orderId) {
     const orderInfo = await this.where({id: orderId}).find();
     let statusText = '未付款';
+    think.logger.debug('order status = ' + orderInfo.order_status);
     switch (orderInfo.order_status) {
       case 0:
         statusText = '未付款';
         break;
+      case 101:
+        statusText = '已取消';
+        break;
+      case 102:
+        statusText = '已删除';
+        break;
+      case 300:
+        statusText = '已发货';
+        break;
+      case 301:
+        statusText = '已收货';
+        break;
+      case 201:
+        statusText = '待发货';
+        break;
+      case 401:
+        statusText = '退款申请';
+        break;
+      case 402:
+        statusText = '退款申请';
+        break;
+      case 403:
+        statusText = '已退款';
     }
 
     return statusText;
@@ -85,10 +109,12 @@ module.exports = class extends think.Model {
    * 更改订单支付状态
    * @param orderId
    * @param payStatus
-   * @returns {Promise.<boolean>}
+   * @returns {Promise.<Integer>}
    */
   async updatePayStatus(orderId, payStatus = 0) {
-    return this.where({id: orderId}).limit(1).update({pay_status: parseInt(payStatus)});
+    // 如果订单支付支付成功，订单状态改为201，否则为0 待支付
+    const orderStatus = payStatus === 2 ? 201 : 0;
+    return this.where({id: orderId}).limit(1).update({pay_status: parseInt(payStatus), order_status: orderStatus});
   }
 
   /**
