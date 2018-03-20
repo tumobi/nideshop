@@ -1,6 +1,6 @@
 {
-  "name": "thinkjs-application",
-  "description": "application created by thinkjs",
+  "name": "nideshop",
+  "description": "nideshop - open source mini program shop",
   "version": "1.0.0",
   "scripts": {
     "start": "node development.js",
@@ -13,6 +13,7 @@
     "jsonwebtoken": "^8.0.0",
     "kcors": "^2.2.1",
     "lodash": "^4.17.4",
+    "md5": "^2.2.1",
     "moment": "^2.18.1",
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
@@ -21,11 +22,9 @@
     "think-logger3": "^1.0.0",
     "think-model": "^1.0.0",
     "think-model-mysql": "^1.0.0",
-    "think-session": "^1.0.0",
-    "think-session-file": "^1.0.5",
-    "think-view": "^1.0.0",
-    "think-view-nunjucks": "^1.0.1",
-    "thinkjs": "^3.0.0"
+    "thinkjs": "^3.0.0",
+    "weixinpay": "^1.0.12",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",

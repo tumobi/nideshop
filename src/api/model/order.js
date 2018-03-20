@@ -80,4 +80,26 @@ module.exports = class extends think.Model {
 
     return statusText;
   }
+
+  /**
+   * 更改订单支付状态
+   * @param orderId
+   * @param payStatus
+   * @returns {Promise.<boolean>}
+   */
+  async updatePayStatus(orderId, payStatus = 0) {
+    return this.where({id: orderId}).limit(1).update({pay_status: parseInt(payStatus)});
+  }
+
+  /**
+   * 根据订单编号查找订单信息
+   * @param orderSn
+   * @returns {Promise.<Promise|Promise<any>|T|*>}
+   */
+  async getOrderByOrderSn(orderSn) {
+    if (think.isEmpty(orderSn)) {
+      return {};
+    }
+    return this.where({order_sn: orderSn}).find();
+  }
 };
