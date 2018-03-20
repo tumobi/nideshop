@@ -1,6 +1,5 @@
 const Base = require('./base.js');
 const rp = require('request-promise');
-const _ = require('lodash');
 
 module.exports = class extends Base {
   async loginByWeixinAction() {

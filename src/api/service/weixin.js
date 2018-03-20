@@ -11,9 +11,9 @@ module.exports = class extends think.Service {
    */
   async decryptUserInfoData(sessionKey, encryptedData, iv) {
     // base64 decode
-    const _sessionKey = new Buffer(sessionKey, 'base64');
-    encryptedData = new Buffer(encryptedData, 'base64');
-    iv = new Buffer(iv, 'base64');
+    const _sessionKey = Buffer.from(sessionKey, 'base64');
+    encryptedData = Buffer.from(encryptedData, 'base64');
+    iv = Buffer.from(iv, 'base64');
     let decoded = '';
     try {
       // 解密
@@ -125,7 +125,6 @@ module.exports = class extends think.Service {
       }
     }
     if (notifyObj.return_code !== 'SUCCESS' || notifyObj.result_code !== 'SUCCESS') {
-      console.log('return_code false');
       return false;
     }
     const signString = this.signQuery(this.buildQuery(notifyObj));

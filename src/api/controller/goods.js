@@ -41,7 +41,7 @@ module.exports = class extends Base {
     if (!think.isEmpty(hotComment)) {
       const commentUser = await this.model('user').field(['nickname', 'username', 'avatar']).where({id: hotComment.user_id}).find();
       commentInfo = {
-        content: new Buffer(hotComment.content, 'base64').toString(),
+        content: Buffer.from(hotComment.content, 'base64').toString(),
         add_time: think.datetime(new Date(hotComment.add_time * 1000)),
         nickname: commentUser.nickname,
         avatar: commentUser.avatar,

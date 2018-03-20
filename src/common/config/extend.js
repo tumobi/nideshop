@@ -3,5 +3,5 @@ const cache = require('think-cache');
 
 module.exports = [
   model(think.app),
-  cache,
+  cache
 ];

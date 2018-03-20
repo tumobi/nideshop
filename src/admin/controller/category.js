@@ -1,5 +1,4 @@
 const Base = require('./base.js');
-const _ = require('lodash');
 
 module.exports = class extends Base {
   /**

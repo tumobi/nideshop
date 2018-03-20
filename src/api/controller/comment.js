@@ -15,7 +15,7 @@ module.exports = class extends Base {
     const typeId = this.post('typeId');
     const valueId = this.post('valueId');
     const content = this.post('content');
-    const buffer = new Buffer(content);
+    const buffer = Buffer.from(content);
     const insertId = await this.model('comment').add({
       type_id: typeId,
       value_id: valueId,
@@ -79,7 +79,7 @@ module.exports = class extends Base {
     const commentList = [];
     for (const commentItem of comments.data) {
       const comment = {};
-      comment.content = new Buffer(commentItem.content, 'base64').toString();
+      comment.content = Buffer.from(commentItem.content, 'base64').toString();
       comment.type_id = commentItem.type_id;
       comment.value_id = commentItem.value_id;
       comment.id = commentItem.id;
