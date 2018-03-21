@@ -33,7 +33,7 @@ module.exports = class extends Base {
     const info = await model.where({'id': goodsId}).find();
     const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(4).select();
     const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
-    const issue = await this.model('goods_issue').select();
+    const issue = await this.model('goods_issue').where({goods_id: goodsId}).select();
     const brand = await this.model('brand').where({id: info.brand_id}).find();
     const commentCount = await this.model('comment').where({value_id: goodsId, type_id: 0}).count();
     const hotComment = await this.model('comment').where({value_id: goodsId, type_id: 0}).find();
