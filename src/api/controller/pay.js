@@ -66,7 +66,8 @@ module.exports = class extends Base {
     const params = {
       appid: think.config('appService.appid'),
       openid: result.openid,
-      action: 'paymentnotify'
+      action: 'paymentnotify',
+      orderno: orderInfo.platform_order
     };
     const clientSecret = think.config('appService.appKey');
     const timestamp = new Date().getTime();
