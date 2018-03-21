@@ -34,7 +34,7 @@ module.exports = class extends think.Model {
     // 1xx表示订单取消和删除等状态 0订单创建成功等待付款，101订单已取消，102订单已删除
     // 2xx表示订单支付状态,201订单已付款，等待发货
     // 3xx表示订单物流相关状态,300订单已发货，301用户确认收货
-    // 4xx表示订单退换货相关的状态,401没有发货，退款402,已收货，退款退货，403退货退款完成
+    // 4xx表示订单退换货相关的状态,401没有发货，退款, 402已收货，退款退货，403退货退款完成
     // 如果订单已经取消或是已完成，则可删除和再次购买
     if (orderInfo.order_status === 101) {
       handleOption.delete = true;
@@ -112,7 +112,7 @@ module.exports = class extends think.Model {
    * @returns {Promise.<Integer>}
    */
   async updatePayStatus(orderId, payStatus = 0) {
-    // 如果订单支付支付成功，订单状态改为201，否则为0 待支付
+    // 如果订单支付成功，订单状态改为201，否则为0 待支付
     const orderStatus = payStatus === 2 ? 201 : 0;
     return this.where({id: orderId}).limit(1).update({pay_status: parseInt(payStatus), order_status: orderStatus});
   }
@@ -127,5 +127,14 @@ module.exports = class extends think.Model {
       return {};
     }
     return this.where({order_sn: orderSn}).find();
+  }
+
+  /**
+   * 取消订单
+   * @param orderId
+   * @returns {Promise<number>}
+   */
+  async cancelOrder(orderId) {
+    return this.where({id: orderId}).limit(1).update({order_status: 101});
   }
 };
