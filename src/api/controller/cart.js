@@ -28,9 +28,9 @@ module.exports = class extends Base {
       cartList: cartList,
       cartTotal: {
         goodsCount: goodsCount,
-        goodsAmount: goodsAmount,
+        goodsAmount: goodsAmount.toFixed(2),
         checkedGoodsCount: checkedGoodsCount,
-        checkedGoodsAmount: checkedGoodsAmount
+        checkedGoodsAmount: checkedGoodsAmount.toFixed(2)
       }
     };
   }
@@ -65,7 +65,7 @@ module.exports = class extends Base {
     }
 
     // 判断购物车中是否存在此规格商品
-    const cartInfo = await this.model('cart').where({goods_id: goodsId, product_id: productId}).find();
+    const cartInfo = await this.model('cart').where({user_id: think.userId, goods_id: goodsId, product_id: productId}).find();
     if (think.isEmpty(cartInfo)) {
       // 添加操作
 
@@ -95,7 +95,7 @@ module.exports = class extends Base {
         checked: 1
       };
 
-      await this.model('cart').thenAdd(cartData, {product_id: productId});
+      await this.model('cart').thenAdd(cartData, {user_id: think.userId, product_id: productId});
     } else {
       // 如果已经存在购物车中，则数量增加
       if (productInfo.goods_number < (number + cartInfo.number)) {
@@ -103,6 +103,7 @@ module.exports = class extends Base {
       }
 
       await this.model('cart').where({
+        user_id: think.userId,
         goods_id: goodsId,
         product_id: productId,
         id: cartInfo.id
@@ -135,7 +136,7 @@ module.exports = class extends Base {
       return this.success(await this.getCart());
     }
 
-    const newCartInfo = await this.model('cart').where({goods_id: goodsId, product_id: productId}).find();
+    const newCartInfo = await this.model('cart').where({user_id: think.userId, goods_id: goodsId, product_id: productId}).find();
     if (think.isEmpty(newCartInfo)) {
       // 直接更新原来的cartInfo
 
@@ -195,7 +196,7 @@ module.exports = class extends Base {
     }
 
     productId = productId.split(',');
-    await this.model('cart').where({product_id: {'in': productId}}).update({checked: parseInt(isChecked)});
+    await this.model('cart').where({user_id: think.userId, product_id: {'in': productId}}).update({checked: parseInt(isChecked)});
 
     return this.success(await this.getCart());
   }
@@ -209,7 +210,7 @@ module.exports = class extends Base {
 
     productId = productId.split(',');
 
-    await this.model('cart').where({product_id: {'in': productId}}).delete();
+    await this.model('cart').where({user_id: think.userId, product_id: {'in': productId}}).delete();
 
     return this.success(await this.getCart());
   }
@@ -230,7 +231,7 @@ module.exports = class extends Base {
    */
   async checkoutAction() {
     const addressId = this.get('addressId'); // 收货地址id
-    // const couponId = this.get('couponId'); // 使用的优惠券id
+    const couponId = this.get('couponId'); // 使用的优惠券id
 
     // 选择的收货地址
     let checkedAddress = null;
@@ -257,24 +258,117 @@ module.exports = class extends Base {
     });
 
     // 获取可用的优惠券信息，功能还示实现
-    const couponList = await this.model('user_coupon').where({user_id: think.userId}).select();
-    const couponPrice = 0.00; // 使用优惠券减免的金额
+    const couponList = await this.model('user_coupon').where({user_id: think.userId, used_time: 0}).select();
+    let couponPrice = 0.00;
+    if (couponId > 0) {
+      // 获取可用的优惠券信息，功能还示实现
+      let couponInfo = null;
+      for (const cp of couponList) {
+        if (cp.id === couponId) {
+          couponInfo = cp;
+        }
+      }
+      if (couponInfo !== null) {
+        couponPrice = await this.model('coupon').where({
+          id: couponInfo.coupon_id
+        }).getField('type_money', true);
+      }
+    }
 
     // 计算订单的费用
     const goodsTotalPrice = cartData.cartTotal.checkedGoodsAmount; // 商品总价
-    const orderTotalPrice = cartData.cartTotal.checkedGoodsAmount + freightPrice - couponPrice; // 订单的总价
-    const actualPrice = orderTotalPrice - 0.00; // 减去其它支付的金额后，要实际支付的金额
+    const orderTotalPrice = cartData.cartTotal.checkedGoodsAmount + freightPrice ; // 订单的总价
+    const actualPrice = orderTotalPrice - couponPrice; // 减去其它支付的金额后，要实际支付的金额
 
     return this.success({
       checkedAddress: checkedAddress,
-      freightPrice: freightPrice,
+      freightPrice: freightPrice.toFixed(2),
       checkedCoupon: {},
       couponList: couponList,
-      couponPrice: couponPrice,
+      couponPrice: couponPrice.toFixed(2),
       checkedGoodsList: checkedGoodsList,
       goodsTotalPrice: goodsTotalPrice,
       orderTotalPrice: orderTotalPrice,
-      actualPrice: actualPrice
+      actualPrice: actualPrice.toFixed(2)
+    });
+  }
+
+  async buynowAction() {
+    const addressId = this.get('addressId'); // 收货地址id
+    const couponId = this.get('couponId'); // 使用的优惠券id
+    const goodId = this.get('goodsId');
+    const specKey = this.get('specKey');
+    const goodNumber = this.get('number');
+
+    // 选择的收货地址
+    let checkedAddress = null;
+    if (addressId === 0) {
+      checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
+    } else {
+      checkedAddress = await this.model('address').where({id: addressId, user_id: think.userId}).find();
+    }
+
+    if (!think.isEmpty(checkedAddress)) {
+      checkedAddress.province_name = await this.model('region').getRegionName(checkedAddress.province_id);
+      checkedAddress.city_name = await this.model('region').getRegionName(checkedAddress.city_id);
+      checkedAddress.district_name = await this.model('region').getRegionName(checkedAddress.district_id);
+      checkedAddress.full_region = checkedAddress.province_name + checkedAddress.city_name + checkedAddress.district_name;
+    }
+
+    // 根据收货地址计算运费
+    const freightPrice = 0.00;
+
+    // 获取产品及规格
+    const product = await this.model('goods').getProductByKey(goodId, specKey);
+    if (think.isEmpty(product)) {
+      return this.fail('获取产品规格失败');
+    }
+    const amount = product.retail_price * goodNumber;
+    let goodsSepcifitionValue = [];
+    if (!think.isEmpty(product.goods_specification_ids)) {
+      goodsSepcifitionValue = await this.model('goods_specification').where({
+        goods_id: goodId,
+        id: {'in': product.goods_specification_ids.split('_')}
+      }).getField('value');
+    }
+
+    const goodInfo = await this.model('goods').where({id: goodId}).find();
+    goodInfo.goods_specifition_name_value = goodsSepcifitionValue.join(';');
+    goodInfo.retail_price = product.retail_price;
+    const checkedGoodsList = [];
+    checkedGoodsList.push(goodInfo);
+
+    const couponList = await this.model('user_coupon').where({user_id: think.userId, used_time: 0}).select();
+    let couponPrice = 0.00;
+    if (couponId > 0) {
+      // 获取可用的优惠券信息，功能还示实现
+      let couponInfo = null;
+      for (const cp of couponList) {
+        if (cp.id === couponId) {
+          couponInfo = cp;
+        }
+      }
+      if (couponInfo !== null) {
+        couponPrice = await this.model('coupon').where({
+          id: couponInfo.coupon_id
+        }).getField('type_money', true);
+      }
+    }
+    // 计算订单的费用
+    let orderTotalPrice = amount.toFixed(2) + freightPrice; // 订单的总价
+    orderTotalPrice = Number(orderTotalPrice).toFixed(2);
+    const actualPrice = orderTotalPrice - couponPrice; // 减去其它支付的金额后，要实际支付的金额
+
+    return this.success({
+      checkedAddress: checkedAddress,
+      freightPrice: freightPrice.toFixed(2),
+      checkedCoupon: {},
+      couponList: couponList,
+      couponPrice: couponPrice.toFixed(2),
+      checkedGoodsList: checkedGoodsList,
+      goodsTotalPrice: amount.toFixed(2),
+      orderTotalPrice: orderTotalPrice,
+      actualPrice: actualPrice.toFixed(2)
     });
   }
 };
