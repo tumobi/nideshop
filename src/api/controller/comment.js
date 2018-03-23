@@ -60,7 +60,7 @@ module.exports = class extends Base {
     const size = this.get('size');
 
     let comments = [];
-    if (showType !== 1) {
+    if (showType != 1) {
       comments = await this.model('comment').where({
         type_id: typeId,
         value_id: valueId
@@ -73,7 +73,12 @@ module.exports = class extends Base {
           join: 'right',
           alias: 'comment_picture',
           on: ['id', 'comment_id']
-        }).page(page, size).where({'comment.type_id': typeId, 'comment.value_id': valueId}).countSelect();
+        })
+        .distinct(["id"])
+        .page(page, size)
+        .order("add_time desc")
+        .where({'comment.type_id': typeId, 'comment.value_id': valueId})
+        .countSelect();
     }
 
     const commentList = [];
