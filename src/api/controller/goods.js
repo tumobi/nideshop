@@ -108,7 +108,9 @@ module.exports = class extends Base {
 
     const goodsQuery = this.model('goods');
 
-    const whereMap = {};
+    const whereMap = {
+      is_delete: 0
+    };
     if (!think.isEmpty(isNew)) {
       whereMap.is_new = isNew;
     }
@@ -193,19 +195,19 @@ module.exports = class extends Base {
     const goodsQuery = this.model('goods');
 
     if (!think.isEmpty(categoryId)) {
-      goodsQuery.where({category_id: {'in': await this.model('category').getChildCategoryId(categoryId)}});
+      goodsQuery.where({is_delete: 0, category_id: {'in': await this.model('category').getChildCategoryId(categoryId)}});
     }
 
     if (!think.isEmpty(isNew)) {
-      goodsQuery.where({is_new: isNew});
+      goodsQuery.where({is_delete: 0, is_new: isNew});
     }
 
     if (!think.isEmpty(isHot)) {
-      goodsQuery.where({is_hot: isHot});
+      goodsQuery.where({is_delete: 0, is_hot: isHot});
     }
 
     if (!think.isEmpty(keyword)) {
-      goodsQuery.where({name: {'like': `%${keyword}%`}});
+      goodsQuery.where({is_delete: 0, name: {'like': `%${keyword}%`}});
     }
 
     let filterCategory = [{
@@ -269,10 +271,10 @@ module.exports = class extends Base {
     let relatedGoods = null;
     if (think.isEmpty(relatedGoodsIds)) {
       // 查找同分类下的商品
-      const goodsCategory = await model.where({id: goodsId}).find();
-      relatedGoods = await model.where({category_id: goodsCategory.category_id}).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
+      const goodsCategory = await model.where({is_delete: 0, id: goodsId}).find();
+      relatedGoods = await model.where({is_delete: 0, category_id: goodsCategory.category_id}).field(['id', 'name', 'list_pic_url', 'retail_price']).limit(8).select();
     } else {
-      relatedGoods = await model.where({id: ['IN', relatedGoodsIds]}).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
+      relatedGoods = await model.where({is_delete: 0, id: ['IN', relatedGoodsIds]}).field(['id', 'name', 'list_pic_url', 'retail_price']).select();
     }
 
     return this.success({
