@@ -59,6 +59,10 @@ module.exports = class extends Base {
       return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
     }
 
+    if (orderInfo.pay_status === 2) {
+      // 已支付过，不用处理
+      return `<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>`;
+    }
     if (orderModel.updatePayStatus(orderInfo.id, 2) === 0) {
       return `<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[订单不存在]]></return_msg></xml>`;
     }
