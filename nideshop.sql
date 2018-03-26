@@ -522,7 +522,7 @@ DROP TABLE IF EXISTS `nideshop_goods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `nideshop_goods` (
-  `id` int(11) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `category_id` int(11) unsigned NOT NULL DEFAULT '0',
   `goods_sn` varchar(60) NOT NULL DEFAULT '',
   `name` varchar(120) NOT NULL DEFAULT '',
@@ -746,7 +746,7 @@ CREATE TABLE `nideshop_order` (
   `add_time` int(11) unsigned NOT NULL DEFAULT '0',
   `confirm_time` int(11) unsigned NOT NULL DEFAULT '0',
   `pay_time` int(11) unsigned NOT NULL DEFAULT '0',
-  `freight_price` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '配送费用',
+  `freight_price` decimal(10,2) unsigned NOT NULL DEFAULT '0.00' COMMENT '配送费用',
   `coupon_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT '使用的优惠券id',
   `parent_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `coupon_price` decimal(10,2) NOT NULL DEFAULT '0.00',

@@ -10,6 +10,16 @@ module.exports = class extends think.Model {
   }
 
   /**
+   * 获取商品的product
+   * @param goodsId
+   * @returns {Promise.<*>}
+   */
+  async getProductByKey(goodsId, specKey = '') {
+    const good = await this.model('product').where({goods_id: goodsId, goods_specification_ids: specKey}).find();
+    return good;
+  }
+
+  /**
    * 获取商品的规格信息
    * @param goodsId
    * @returns {Promise.<Array>}
