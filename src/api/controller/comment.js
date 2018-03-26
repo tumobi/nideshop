@@ -60,7 +60,7 @@ module.exports = class extends Base {
     const size = this.get('size');
 
     let comments = [];
-    if (showType !== 1) {
+    if (showType !== '1') {
       comments = await this.model('comment').where({
         type_id: typeId,
         value_id: valueId
