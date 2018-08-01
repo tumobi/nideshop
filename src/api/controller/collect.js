@@ -12,7 +12,7 @@ module.exports = class extends Base {
         join: 'left',
         as: 'g',
         on: ['c.value_id', 'g.id']
-      }).where({user_id: think.userId, type_id: parseInt(typeId)}).countSelect();
+      }).where({user_id: this.getLoginUserId(), type_id: parseInt(typeId)}).countSelect();
 
     return this.success(list);
   }
@@ -21,7 +21,7 @@ module.exports = class extends Base {
     const typeId = this.post('typeId');
     const valueId = this.post('valueId');
 
-    const collect = await this.model('collect').where({type_id: typeId, value_id: valueId, user_id: think.userId}).find();
+    const collect = await this.model('collect').where({type_id: typeId, value_id: valueId, user_id: this.getLoginUserId()}).find();
     let collectRes = null;
     let handleType = 'add';
     if (think.isEmpty(collect)) {
@@ -29,7 +29,7 @@ module.exports = class extends Base {
       collectRes = await this.model('collect').add({
         type_id: typeId,
         value_id: valueId,
-        user_id: think.userId,
+        user_id: this.getLoginUserId(),
         add_time: parseInt(new Date().getTime() / 1000)
       });
     } else {

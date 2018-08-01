@@ -1,16 +1,16 @@
 module.exports = class extends think.Controller {
   async __before() {
     // 根据token值获取用户id
-    think.token = this.ctx.header['x-nideshop-token'] || '';
+    this.ctx.state.token = this.ctx.header['x-nideshop-token'] || '';
     const tokenSerivce = think.service('token', 'api');
-    think.userId = await tokenSerivce.getUserId();
+    this.ctx.state.userId = await tokenSerivce.getUserId(this.ctx.state.token);
 
     const publicController = this.config('publicController');
     const publicAction = this.config('publicAction');
     // 如果为非公开，则验证用户是否登录
     const controllerAction = this.ctx.controller + '/' + this.ctx.action;
     if (!publicController.includes(this.ctx.controller) && !publicAction.includes(controllerAction)) {
-      if (think.userId <= 0) {
+      if (this.ctx.state.userId <= 0) {
         return this.fail(401, '请先登录');
       }
     }
@@ -29,6 +29,6 @@ module.exports = class extends think.Controller {
    * @returns {*}
    */
   getLoginUserId() {
-    return think.userId;
+    return this.ctx.state.userId;
   }
 };

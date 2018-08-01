@@ -6,7 +6,7 @@ module.exports = class extends Base {
    * @returns {Promise.<{cartList: *, cartTotal: {goodsCount: number, goodsAmount: number, checkedGoodsCount: number, checkedGoodsAmount: number}}>}
    */
   async getCart() {
-    const cartList = await this.model('cart').where({user_id: think.userId, session_id: 1}).select();
+    const cartList = await this.model('cart').where({user_id: this.getLoginUserId(), session_id: 1}).select();
     // 获取购物车统计信息
     let goodsCount = 0;
     let goodsAmount = 0.00;
@@ -87,7 +87,7 @@ module.exports = class extends Base {
         list_pic_url: goodsInfo.list_pic_url,
         number: number,
         session_id: 1,
-        user_id: think.userId,
+        user_id: this.getLoginUserId(),
         retail_price: productInfo.retail_price,
         market_price: productInfo.retail_price,
         goods_specifition_name_value: goodsSepcifitionValue.join(';'),
@@ -235,9 +235,9 @@ module.exports = class extends Base {
     // 选择的收货地址
     let checkedAddress = null;
     if (addressId) {
-      checkedAddress = await this.model('address').where({is_default: 1, user_id: think.userId}).find();
+      checkedAddress = await this.model('address').where({is_default: 1, user_id: this.getLoginUserId()}).find();
     } else {
-      checkedAddress = await this.model('address').where({id: addressId, user_id: think.userId}).find();
+      checkedAddress = await this.model('address').where({id: addressId, user_id: this.getLoginUserId()}).find();
     }
 
     if (!think.isEmpty(checkedAddress)) {

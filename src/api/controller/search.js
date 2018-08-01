@@ -6,7 +6,7 @@ module.exports = class extends Base {
     const defaultKeyword = await this.model('keywords').where({ is_default: 1 }).limit(1).find();
     // 取出热闹关键词
     const hotKeywordList = await this.model('keywords').distinct('keyword').field(['keyword', 'is_hot']).limit(10).select();
-    const historyKeywordList = await this.model('search_history').distinct('keyword').where({ user_id: think.userId }).limit(10).getField('keyword');
+    const historyKeywordList = await this.model('search_history').distinct('keyword').where({ user_id: this.getLoginUserId() }).limit(10).getField('keyword');
 
     return this.success({
       defaultKeyword: defaultKeyword,
@@ -22,7 +22,7 @@ module.exports = class extends Base {
   }
 
   async clearhistoryAction() {
-    await this.model('search_history').where({ user_id: think.userId }).delete();
+    await this.model('search_history').where({ user_id: this.getLoginUserId() }).delete();
     return this.success();
   }
 };
