@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  EnvironmentSize:
+    Description: Select Environment Size (S, M, L)
+    Type: String
+    Default: SMALL
+    AllowedValues:
+      - SMALL
+      - MEDIUM
+      - LARGE
+  KeyName:
+    Description: "Key pair to allow SSH access to the instance"
+    Type: AWS::EC2::KeyPair::KeyName
+  DatabaseName:
+    Type: String
+    Default: nideshop
+  DatabaseUser:
+    Type: String
+    Default: nideshop
+  DatabasePassword:
+    Type: String
+    NoEcho: true
+    MinLength: 1
+    AllowedPattern: ^[a-zA-Z0-9]*$
+  WeChatAppId:
+    Type: String
+    Description: Register https://mp.weixin.qq.com/wxopen/waregister?action=step1 (Setting -> Development Setting)
+  WeChatSecret:
+    Type: String
+    Description: Register https://mp.weixin.qq.com/wxopen/waregister?action=step1 (Setting -> Development Setting)
+  WeChatMchId:
+    Type: String
+    Description: (Optional) Merchant Id from WeChat mini program (For WeChat payment)
+  WeChatPartnerKey:
+    Type: String
+    Description: (Optional) WeChat payment partner key
+  WeChatCallbackURL:
+    Type: String
+    Description: (Optional) WeChat async callback. (Ex https://www.nideshop.com/api/pay/notify)
+Mappings:
+  RegionMap:
+    us-east-1:
+      "AMALINUX": "ami-013be31976ca2c322"
+    us-east-2:
+      "AMALINUX": "ami-0b59bfac6be064b78"
+    us-west-1:
+      "AMALINUX": "ami-01beb64058d271bc4"
+    us-west-2:
+      "AMALINUX": "ami-061e7ebbc234015fe"
+    ca-central-1:
+      "AMALINUX": "ami-05cac140c6a1fb960"
+    eu-west-1:
+      "AMALINUX": "ami-0a5e707736615003c"
+    eu-central-1:
+      "AMALINUX": "ami-02ea8f348fa28c108"
+    eu-west-2:
+      "AMALINUX": "ami-017b0e29fac27906b"
+    eu-west-3:
+      "AMALINUX": "ami-04992646d54c69ef4"
+    ap-southeast-1:
+      "AMALINUX": "ami-085fd1bd447be68e8"
+    ap-southeast-2:
+      "AMALINUX": "ami-0b8dea0e70b969adc"
+    ap-northeast-2:
+      "AMALINUX": "ami-0a10b2721688ce9d2"
+    ap-northeast-1:
+      "AMALINUX": "ami-00f9d04b3b3092052"
+    ap-south-1:
+      "AMALINUX": "ami-0912f71e06545ad88"
+    sa-east-1:
+      "AMALINUX": "ami-0160a8b6087883cb6"
+  InstanceSize:
+    SMALL:
+      "EC2": "t3.micro"
+      "DB": "db.t2.micro"
+    MEDIUM:
+      "EC2": "t3.small"
+      "DB": "db.t2.small"
+    LARGE:
+      "EC2": "t3.medium"
+      "DB": "db.t2.medium"
+Resources:
+  SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Enable mysql and nodejs ports
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8360
+          ToPort: 8360
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+  Database:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      Engine: "MySQL"
+      AllocatedStorage: 20
+      StorageType: gp2
+      DBInstanceClass: !FindInMap [InstanceSize, !Ref EnvironmentSize, DB]
+      DBName: !Ref DatabaseName
+      VPCSecurityGroups:
+        - !GetAtt SecurityGroup.GroupId
+      MasterUsername: !Ref DatabaseUser
+      MasterUserPassword: !Ref DatabasePassword
+      MultiAZ: false
+      PubliclyAccessible: false
+  EC2:
+    Type: "AWS::EC2::Instance"
+    DependsOn: Database
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMALINUX]
+      InstanceType: !FindInMap [InstanceSize, !Ref EnvironmentSize, EC2]
+      KeyName: !Ref KeyName
+      SecurityGroups:
+        - !Ref SecurityGroup
+      UserData:
+        "Fn::Base64": !Sub |
+          #!/bin/bash
+          yum update -y aws-cfn-bootstrap # good practice - always do this.
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2 --configsets nideshop --region ${AWS::Region}
+          yum -y update
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource EC2 --region ${AWS::Region}
+    CreationPolicy:
+      ResourceSignal:
+        Count: "1"
+        Timeout: PT15M
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          nideshop:
+            - "configure_cfn"
+            - "installPackages"
+            - "initialSetup"
+            - "configuration"
+            - "startServer"
+        configure_cfn:
+          files:
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.EC2.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource EC2 --configsets nideshop --region ${AWS::Region}
+              mode: "000400"
+              owner: root
+              group: root
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                verbose=true
+                interval=5
+              mode: "000400"
+              owner: root
+              group: root
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: "true"
+                ensureRunning: "true"
+                files:
+                  - "/etc/cfn/cfn-hup.conf"
+                  - "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+        installPackages:
+          packages:
+            yum:
+              git: []
+              mariadb: []
+            services:
+              sysvinit:
+                httpd:
+                  enabled: "true"
+                  ensureRunning: "true"
+          commands:
+            01installNode:
+              command: !Join
+                - ""
+                - - "curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -\n"
+                  - "yum install -y nodejs\n"
+                  - "echo 'Node.JS Installed'\n"
+        initialSetup:
+          sources:
+            /var/www/nideshop: "https://github.com/tumobi/nideshop/tarball/master"
+          commands:    
+            01initDBSchema:
+              command: !Sub |
+                mysql --host=${Database.Endpoint.Address} --port=${Database.Endpoint.Port} --user=${DatabaseUser} --password=${DatabasePassword} --execute="ALTER DATABASE ${DatabaseName} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+                mysql --host=${Database.Endpoint.Address} --port=${Database.Endpoint.Port} --user=${DatabaseUser} --password=${DatabasePassword} ${DatabaseName} < nideshop.sql
+              cwd: "/var/www/nideshop"
+        configuration:
+          files:
+            /var/www/nideshop/src/common/config/database.js:
+              content: !Sub |
+                const mysql = require('think-model-mysql');
+                module.exports = {
+                    handle: mysql,
+                    database: '${DatabaseName}',
+                    prefix: '${DatabaseName}_',
+                    encoding: 'utf8mb4',
+                    host: '${Database.Endpoint.Address}',
+                    port: '${Database.Endpoint.Port}',
+                    user: '${DatabaseUser}',
+                    password: '${DatabasePassword}',
+                    dateStrings: true
+                };
+            /var/www/nideshop/src/common/config/config.js:
+              content: !Sub |
+                // default config
+                module.exports = {
+                  default_module: 'api',
+                  weixin: {
+                    appid: '${WeChatAppId}',
+                    secret: '${WeChatSecret}',
+                    mch_id: '${WeChatMchId}',
+                    partner_key: '${WeChatPartnerKey}',
+                    notify_url: '${WeChatCallbackURL}'
+                  }
+                };
+            /var/www/nideshop/pm2.json:
+              content: !Sub |
+                {
+                  "apps": [{
+                    "name": "nideshop",
+                    "script": "production.js",
+                    "cwd": "/var/www/nideshop",
+                    "exec_mode": "fork",
+                    "max_memory_restart": "1G",
+                    "autorestart": true,
+                    "node_args": [],
+                    "args": [],
+                    "env": {
+                      
+                    }
+                  }]
+                }
+        startServer:
+          commands:
+            01installAndStart:
+              command: !Sub |
+                npm install -g think-cli pm2
+                npm install
+                npm run compile
+                pm2 startOrReload pm2.json
+              cwd: "/var/www/nideshop"
+Outputs:
+  ApplicationURL:
+    Description: "Server URL"
+    Value: !Sub |
+      http://${EC2.PublicDnsName}:8360

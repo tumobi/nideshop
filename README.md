@@ -63,6 +63,8 @@ npm start
 
 ### 线上部署
 
++ AWS CloudFormation  [![一键部署](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=nideshop&templateURL=https://s3-us-west-2.amazonaws.com/gudongfeng/nideshop_cf.yaml)
+  > AWS CloudFormation 一键部署完成之后，可以通过CloudFormation -> Stacks -> Outputs，打开ApplicationURL来访问服务器地址
 + 没有域名部署参考文档：[不用买域名、不用备案、不用配置https快速部署Node.js微信小程序商城（基于Node.js+MySQL+ThinkJS）](http://www.jianshu.com/p/78a0f5f424e1)
 
 + 如有域名且已备案，可参考：
