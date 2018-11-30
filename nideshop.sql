@@ -4699,7 +4699,7 @@ CREATE TABLE `nideshop_keywords` (
   `scheme _url` varchar(255) NOT NULL DEFAULT '' COMMENT '关键词的跳转链接',
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`keyword`,`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='热闹关键词表';
 
 -- ----------------------------
@@ -4707,12 +4707,12 @@ CREATE TABLE `nideshop_keywords` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `nideshop_keywords` VALUES ('520元礼包抢先领', 1, 1, 1, 1, '', 1, 0);
-INSERT INTO `nideshop_keywords` VALUES ('单鞋', 0, 0, 1, 8, '', 10, 0);
+INSERT INTO `nideshop_keywords` VALUES ('单鞋', 0, 0, 1, 8, '', 7, 0);
 INSERT INTO `nideshop_keywords` VALUES ('墨镜', 0, 0, 1, 5, '', 5, 0);
-INSERT INTO `nideshop_keywords` VALUES ('夏凉被', 0, 0, 1, 100, '', 3, 0);
+INSERT INTO `nideshop_keywords` VALUES ('夏凉被', 0, 0, 1, 100, '', 6, 0);
 INSERT INTO `nideshop_keywords` VALUES ('新品上市', 0, 0, 1, 100, '', 4, 0);
-INSERT INTO `nideshop_keywords` VALUES ('日式', 0, 0, 1, 100, '', 1, 0);
-INSERT INTO `nideshop_keywords` VALUES ('母亲节', 0, 0, 1, 100, '', 1, 0);
+INSERT INTO `nideshop_keywords` VALUES ('日式', 0, 0, 1, 100, '', 3, 0);
+INSERT INTO `nideshop_keywords` VALUES ('母亲节', 0, 0, 1, 100, '', 2, 0);
 COMMIT;
 
 -- ----------------------------
