@@ -33,7 +33,7 @@ module.exports = class extends Base {
     const newUserInfo = await this.model('user').field(['id', 'username', 'nickname', 'gender', 'avatar', 'birthday']).where({ id: userId }).find();
 
     // 更新登录信息
-    userId = await this.model('user').where({ id: userId }).update({
+    await this.model('user').where({ id: userId }).update({
       last_login_time: parseInt(new Date().getTime() / 1000),
       last_login_ip: clientIp
     });
