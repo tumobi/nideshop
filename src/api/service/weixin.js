@@ -20,23 +20,20 @@ module.exports = class extends think.Service {
       let sessionData = await rp(options);
       sessionData = JSON.parse(sessionData);
       if (!sessionData.openid) {
-        return null;
+        return { errno: sessionData.errcode, errmsg: sessionData.errmsg, data: null };
       }
 
       // 验证用户信息完整性
       const sha1 = crypto.createHash('sha1').update(fullUserInfo.rawData.toString() + sessionData.session_key).digest('hex');
       if (fullUserInfo.signature !== sha1) {
-        return null;
+        return { errno: 400, errmsg: `signature 校验不一致`, data: null };
       }
 
       // 解析用户数据
       const wechatUserInfo = await this.decryptUserInfoData(sessionData.session_key, fullUserInfo.encryptedData, fullUserInfo.iv);
-      if (think.isEmpty(wechatUserInfo)) {
-        return null;
-      }
       return wechatUserInfo;
     } catch (e) {
-      return null;
+      return { errno: 400, errmsg: '微信登录失败：' + e.message, data: null };
     }
   }
 
@@ -61,7 +58,7 @@ module.exports = class extends think.Service {
       decoded += decipher.final('utf8');
       const userInfo = JSON.parse(decoded);
       if (userInfo.watermark.appid !== think.config('weixin.appid')) {
-        return null;
+        return { errno: 400, errmsg: 'watermark appid 错误', data: null };
       }
 
       // 解析后的数据格式
@@ -74,9 +71,9 @@ module.exports = class extends think.Service {
       //   country: 'China',
       //   avatarUrl: 'https://wx.qlogo.cn/mmopen/vi_32/9Otwibfa5VXR0ntXdlX84dibbulWLJ0EiacHeAfT1ShG2A7LQa2unfbZVohsWQlmXbwQGM6NnhGFWicY5icdxFVdpLQ/132',
       //   watermark: { timestamp: 1542639764, appid: 'wx262f4ac3b1c477dd' } }
-      return userInfo;
+      return { errno: 0, errmsg: '', data: userInfo };
     } catch (err) {
-      return null;
+      return { errno: 500, errmsg: '解析用户数据错误：' + err.message, data: null };
     }
   }
 

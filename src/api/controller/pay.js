@@ -18,7 +18,7 @@ module.exports = class extends Base {
     }
     const openid = await this.model('user').where({ id: orderInfo.user_id }).getField('weixin_openid', true);
     if (think.isEmpty(openid)) {
-      return this.fail('微信支付失败');
+      return this.fail('微信支付失败 openid empty');
     }
     const WeixinSerivce = this.service('weixin', 'api');
     try {
@@ -31,7 +31,7 @@ module.exports = class extends Base {
       });
       return this.success(returnParams);
     } catch (err) {
-      return this.fail('微信支付失败');
+      return this.fail(400, `微信支付失败 ${err.err_code_des || err.return_msg}`);
     }
   }
 

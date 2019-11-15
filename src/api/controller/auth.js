@@ -7,9 +7,9 @@ module.exports = class extends Base {
     const clientIp = this.ctx.ip;
 
     // 解释用户数据
-    const userInfo = await this.service('weixin', 'api').login(code, fullUserInfo);
-    if (think.isEmpty(userInfo)) {
-      return this.fail('登录失败');
+    const { errno, errmsg, data: userInfo } = await this.service('weixin', 'api').login(code, fullUserInfo);
+    if (errno !== 0) {
+      return this.fail(errno, errmsg);
     }
 
     // 根据openid查找用户是否已经注册
@@ -41,8 +41,8 @@ module.exports = class extends Base {
     const TokenSerivce = this.service('token', 'api');
     const sessionKey = await TokenSerivce.create({ user_id: userId });
 
-    if (think.isEmpty(newUserInfo) || think.isEmpty(sessionKey)) {
-      return this.fail('登录失败');
+    if (think.isEmpty(sessionKey)) {
+      return this.fail('生成 token 失败');
     }
 
     return this.success({ token: sessionKey, userInfo: newUserInfo });
