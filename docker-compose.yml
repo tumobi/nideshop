@@ -1,0 +1,20 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.backend
+    ports:
+      - "18360:8360"
+    depends_on:
+      - mysql
+  mysql:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.database
+    ports:
+      - "13306:3306"
+    volumes:
+      - "nideshop-mysql-db:/var/lib/mysql"
+volumes:
+  nideshop-mysql-db: {}

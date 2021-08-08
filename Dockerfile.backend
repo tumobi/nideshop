@@ -1,0 +1,7 @@
+FROM node:lts-alpine3.14
+RUN mkdir -p /var/nideshop
+COPY ./ /var/nideshop/
+WORKDIR /var/nideshop
+RUN sed -i 's/127.0.0.1/mysql/g' src/common/config/database.js
+EXPOSE 8360/tcp
+CMD ["npm","start"]
