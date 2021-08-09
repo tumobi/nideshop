@@ -1,0 +1,5 @@
+FROM mysql:5.7.35
+RUN mkdir -p /var/dbconfig
+COPY ./nideshop.sql /docker-entrypoint-initdb.d
+ENV MYSQL_ROOT_PASSWORD 1
+CMD ["mysqld"]
