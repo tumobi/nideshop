@@ -61,7 +61,7 @@ npm start
 访问http://127.0.0.1:8360/
 
 ### 线上部署
-[云服务器ECS-云主机优惠-2折上云](https://promotion.aliyun.com/ntms/act/qwbk.html?userCode=3grpysgf)
+[云服务器ECS-云主机优惠-2折上云](https://www.aliyun.com/daily-act/ecs/activity_selection?userCode=3grpysgf)
 
 [在阿里云（CentOS 7）上部署文档](https://www.nideshop.com/documents/nideshop-manual/deployment-centos)
 
